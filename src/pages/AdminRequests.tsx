@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Modal, message } from "antd";
 import { Book, Request } from "../types";
-import { DEFAULT_REQUESTS } from "../context/default";
+import { DEFAULT_REQUESTS } from "../constants";
 import AdminRequestTable from "../components/AdminRequestTable";
 import BookListModal from "../components/BookListModal";
 

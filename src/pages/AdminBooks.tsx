@@ -8,7 +8,7 @@ import {
 } from "@ant-design/icons";
 
 import AdminBookTable from "../components/AdminBookTable";
-import { DEFAULT_BOOKS } from "../context/default";
+import { DEFAULT_BOOKS } from "../constants";
 import { Book } from "../types";
 import AdminBookFormModal from "../components/AdminBookFormModal";
 

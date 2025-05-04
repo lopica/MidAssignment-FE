@@ -1,13 +1,13 @@
 // Main.tsx or index.tsx
 import { createRoot } from "react-dom/client";
 import "./assets/css/index.css";
-import App from "./Routes.tsx";
+import App from "./routes.tsx";
 import { BrowserRouter } from "react-router";
 import { StoreContext } from "./context/store";
 import { useMemo, useState } from "react";
 import { StoreContextType, StoreType } from "./types.ts";
-import { DEFAULT_STORE_VALUE } from "./context/default.ts";
-import '@ant-design/v5-patch-for-react-19';
+import { DEFAULT_STORE_VALUE } from "./constants.ts";
+import "@ant-design/v5-patch-for-react-19";
 
 function Root() {
   const [store, setStore] = useState<StoreContextType>(DEFAULT_STORE_VALUE);

@@ -149,7 +149,7 @@ export default function AdminBookTable({
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
-        <Button onClick={() => onEdit?.(record.key)} type="primary">
+        <Button onClick={() => onEdit?.(record.key)} type="link">
           Edit
         </Button>
       ),

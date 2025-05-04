@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DEFAULT_REQUESTS } from "../context/default";
+import { DEFAULT_REQUESTS } from "../constants";
 import RequestTable from "../components/RequestTable";
 import RequestBookModal from "../components/BookListModal";
 import { Book, Request } from "../types";

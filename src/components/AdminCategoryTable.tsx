@@ -3,14 +3,16 @@ import type { ColumnsType } from "antd/es/table";
 import type { Key } from "react";
 import { Book, Category } from "../types";
 
-
-interface AdminCategoryTableProps {
+type AdminCategoryTableProps = {
   data: Category[];
   deletionMode: boolean;
   selectedRowKeys: Key[];
   onSelectionChange: (keys: Key[]) => void;
   onViewBooks: (categoryName: string, books: Book[]) => void;
-}
+  totalItems: number;
+  onEditCategory: (category: Category) => void; 
+  onPageChange: (page: number, pageSize: number) => void;
+};
 
 export default function AdminCategoryTable({
   data,
@@ -18,6 +20,9 @@ export default function AdminCategoryTable({
   selectedRowKeys,
   onSelectionChange,
   onViewBooks,
+  totalItems,
+  onEditCategory, 
+  onPageChange
 }: Readonly<AdminCategoryTableProps>) {
   const columns: ColumnsType<Category> = [
     {
@@ -39,6 +44,17 @@ export default function AdminCategoryTable({
         </Button>
       ),
     },
+    {
+      title: "Action",
+      render: (_text, record) => (
+        <Button
+          type="link"
+          onClick={() => onEditCategory(record)} // Trigger the edit modal with the category
+        >
+          Edit
+        </Button>
+      ),
+    },
   ];
 
   const rowSelection = {
@@ -53,9 +69,11 @@ export default function AdminCategoryTable({
       dataSource={data}
       pagination={{
         pageSize: 5,
+        total: totalItems,
         showTotal: (total, range) =>
           `${range[0]}-${range[1]} of ${total} categories`,
       }}
+      onChange={(pagination) => onPageChange(pagination.current!, pagination.pageSize!)}
       bordered
     />
   );

@@ -1,9 +1,9 @@
-import React, { useState, Key } from 'react';
-import { Button, Form } from 'antd';
-import { Book } from '../types';
-import { DEFAULT_BOOKS } from '../context/default';
-import BookTable from '../components/BookTable';
-import BorrowBookModal from '../components/BorrowBookModal';
+import React, { useState, Key } from "react";
+import { Button, Form } from "antd";
+import { Book } from "../types";
+import { DEFAULT_BOOKS } from "../constants";
+import BookTable from "../components/BookTable";
+import BorrowBookModal from "../components/BorrowBookModal";
 
 const data: Book[] = DEFAULT_BOOKS;
 
@@ -18,7 +18,9 @@ export default function Books(): React.ReactElement {
 
   const handleBorrowClick = () => {
     // Filter the selected books from the data
-    const selectedBooks = data.filter((book) => selectedRowKeys.includes(book.key));
+    const selectedBooks = data.filter((book) =>
+      selectedRowKeys.includes(book.key)
+    );
     setBorrowedBooks(selectedBooks);
     setIsModalVisible(true);
   };
@@ -35,7 +37,6 @@ export default function Books(): React.ReactElement {
     setIsModalVisible(false);
   };
 
-
   return (
     <div className="p-4">
       <div className="flex justify-end items-center mb-4">
@@ -48,20 +49,20 @@ export default function Books(): React.ReactElement {
           Borrow ({selectedRowKeys.length})
         </Button>
       </div>
-      
+
       <div className="bg-white rounded-lg shadow">
         <BookTable
           data={data}
           loading={loading}
           selectedRowKeys={selectedRowKeys}
-          setSelectedRowKeys={setSelectedRowKeys} 
+          setSelectedRowKeys={setSelectedRowKeys}
         />
       </div>
 
-      <BorrowBookModal 
-        isModalVisible={isModalVisible} 
-        handleCancel={handleCancel} 
-        handleSubmit={handleSubmit} 
+      <BorrowBookModal
+        isModalVisible={isModalVisible}
+        handleCancel={handleCancel}
+        handleSubmit={handleSubmit}
         form={form}
         borrowedBooks={borrowedBooks}
       />

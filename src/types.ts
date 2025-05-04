@@ -42,7 +42,23 @@ export type Book = {
 };
 
 export type Category = {
-  key: string;
+  id?: string;
+  key?: string;
   name: string;
   books: Book[];
 };
+
+export type Response = {
+  success: boolean;
+  statusCode: number;
+  errors: string[] | null;
+  content: any
+}
+
+export type PaginatedResult<T> = {
+  data: T[];
+  currentPage: number;
+  totalPage: number;
+  limit: number;
+}
+
