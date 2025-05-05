@@ -9,18 +9,18 @@ export default function RequestTable({
   const columns: ColumnsType<Request> = [
     {
       title: "Ordinal",
-      dataIndex: "key",
-      key: "key",
+      key: "ordinal",
+      render: (_text, _record, index) => index + 1,
     },
     {
       title: "Requestor (Email)",
-      dataIndex: "requestor",
-      key: "requestor",
+      dataIndex: "requestorEmail",
+      key: "requestorEmail",
     },
     {
       title: "Date Requested",
-      dataIndex: "dateRequested",
-      key: "dateRequested",
+      dataIndex: "requestDate", // ✅ fixed typo
+      key: "requestDate",
       render: (date: string) =>
         new Date(date).toLocaleDateString("en-US", {
           year: "numeric",
@@ -28,8 +28,7 @@ export default function RequestTable({
           day: "2-digit",
         }),
       sorter: (a, b) =>
-        new Date(a.dateRequested).getTime() -
-        new Date(b.dateRequested).getTime(),
+        new Date(a.requestDate).getTime() - new Date(b.requestDate).getTime(),
     },
     {
       title: "Books",
@@ -47,9 +46,12 @@ export default function RequestTable({
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status: string) => {
-        const typedStatus = status as keyof typeof statusColors;
-        return <Tag color={statusColors[typedStatus]}>{status}</Tag>;
+      render: (status: 0 | 1 | 2) => {
+        const statusMap: Record<0 | 1 | 2, "approved" | "rejected" | "waiting"> =
+          { 0: "approved", 1: "rejected", 2: "waiting" };
+
+        const statusLabel = statusMap[status];
+        return <Tag color={statusColors[statusLabel]}>{statusLabel}</Tag>;
       },
     },
   ];

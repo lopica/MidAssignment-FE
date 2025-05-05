@@ -1,7 +1,8 @@
 import { Book, Category, PaginatedResult, Request, StoreContextType } from "./types";
 
 export const DEFAULT_STORE_VALUE: StoreContextType = {
-  role: "user",
+  userId: "145a1994-6e25-456a-ac4a-3f13fd21afa9",
+  role: "admin",
 };
 
 
@@ -171,35 +172,48 @@ DEFAULT_CATEGORIES.forEach(category => {
 
 export const DEFAULT_REQUESTS: Request[] = [
   {
+    id: "r1",
     key: "1",
-    requestor: "john.doe@example.com",
-    dateRequested: "2024-05-01",
+    requestDate: "2024-05-01",
+    dueDate: "2024-05-15",
+    updateDate: "2024-05-01",
+    requestorEmail: "john.doe@example.com",
+    approverEmail: "admin@example.com",
     books: [
       DEFAULT_BOOKS.find((book) => book.title === "1984")!,
       DEFAULT_BOOKS.find((book) => book.title === "The Hobbit")!,
     ],
-    status: "waiting",
+    status: 0, // approved
   },
   {
+    id: "r2",
     key: "2",
-    requestor: "jane.smith@example.com",
-    dateRequested: "2024-04-28",
+    requestDate: "2024-04-28",
+    dueDate: "2024-05-10",
+    updateDate: "2024-04-29",
+    requestorEmail: "jane.doe@example.com",
+    approverEmail: "admin@example.com",
     books: [
       DEFAULT_BOOKS.find((book) => book.title === "To Kill a Mockingbird")!,
     ],
-    status: "approved",
+    status: 1, // rejected
   },
   {
+    id: "r3",
     key: "3",
-    requestor: "alice@example.com",
-    dateRequested: "2024-04-26",
+    requestDate: "2024-04-26",
+    dueDate: "2024-05-09",
+    updateDate: "2024-04-26",
+    requestorEmail: "alice@example.com",
+    approverEmail: "admin@example.com",
     books: [
       DEFAULT_BOOKS.find((book) => book.title === "Brave New World")!,
       DEFAULT_BOOKS.find((book) => book.title === "The Alchemist")!,
     ],
-    status: "rejected",
+    status: 2, // waiting
   },
 ];
+
 
 export const PAGINATED_BOOKS: PaginatedResult<Book> = {
   data: DEFAULT_BOOKS.slice(0, 5), // Simulating page 1

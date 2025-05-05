@@ -1,9 +1,11 @@
-import React, { useState, useEffect, Key } from "react";
+import React, { useState, useEffect, Key, useContext } from "react";
 import { Button, Form, message } from "antd";
 import { Book } from "../types";
 import BookTable from "../components/BookTable";
 import BorrowBookModal from "../components/BorrowBookModal";
 import { getAllBooks } from "../apis/bookApi";
+import { addRequest } from "../apis/requestApi";
+import { StoreContext } from "../context/store";
 
 export default function Books(): React.ReactElement {
   const [loading, setLoading] = useState<boolean>(false);
@@ -12,6 +14,7 @@ export default function Books(): React.ReactElement {
   const [borrowedBooks, setBorrowedBooks] = useState<Book[]>([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
   const [data, setData] = useState<Book[]>([]);
+  const [store] = useContext(StoreContext)
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
@@ -65,14 +68,27 @@ export default function Books(): React.ReactElement {
     setIsModalVisible(false);
   };
 
-  const handleSubmit = (values: any) => {
-    const dueDate = new Date(values.dueDate);
-    console.log("Borrowed Books:", borrowedBooks);
-    console.log("Due Date:", dueDate);
-    setIsModalVisible(false);
-    message.success("Books borrowed successfully.");
+  const handleSubmit = async (values: any) => {
+    const dueDate = new Date(values.dueDate).toISOString();
+  
+    const requestPayload = {
+      requestorId: store.userId, // Replace with real user ID from auth context/store
+      dueDate,
+      bookIds: borrowedBooks.map(book => book.id),
+    };
+  
+    try {
+      await addRequest(requestPayload);
+      message.success("Books borrowed successfully.");
+      setIsModalVisible(false);
+      form.resetFields(); // Clear form
+      setSelectedRowKeys([]); // Clear selection
+    } catch (error) {
+      message.error("Failed to borrow books.");
+      console.error(error);
+    }
   };
-
+  
   return (
     <div className="p-4">
       <div className="flex justify-end items-center mb-4">

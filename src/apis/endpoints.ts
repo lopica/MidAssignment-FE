@@ -37,11 +37,22 @@ const ENDPOINTS = {
     DELETE: (id: string) => `/api/books/${id}`,
   },
   REQUESTS: {
-    GET_ALL: "/api/requests",
-    GET_BY_ID: (id: string) => `/api/requests/${id}`,
-    ADD: "/api/requests/add",
-    UPDATE: (id: string) => `/api/requests/${id}`,
-    DELETE: (id: string) => `/api/requests/${id}`,
+    GET_ALL: (currentPage: number = 1, limit: number = 5, userId?: string) => {
+        const params = new URLSearchParams({
+          currentPage: currentPage.toString(),
+          limit: limit.toString(),
+        });
+    
+        if (userId) {
+          params.append("userId", userId);
+        }
+    
+        return `/api/borrowing-requests?${params.toString()}`;
+      },
+    GET_BY_ID: (id: string) => `/api/borrowing-requests/${id}`,
+    ADD: "/api/borrowing-requests",
+    UPDATE: (id: string) => `/api/borrowing-requests/${id}`,
+    DELETE: (id: string) => `/api/borrowing-requests/${id}`,
   },
 };
 

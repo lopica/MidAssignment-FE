@@ -15,13 +15,19 @@ interface AdminRequestTableProps {
   onViewBooks: (books: Book[]) => void;
 }
 
+const statusMap: Record<Request["status"], string> = {
+  0: "approved",
+  1: "rejected",
+  2: "waiting",
+};
+
 export default function AdminRequestTable({
   requests,
   onStatusChange,
   onViewBooks,
 }: Readonly<AdminRequestTableProps>) {
-  const [searchText, setSearchText] = React.useState('');
-  const [searchedColumn, setSearchedColumn] = React.useState('');
+  const [searchText, setSearchText] = React.useState("");
+  const [searchedColumn, setSearchedColumn] = React.useState("");
 
   const handleSearch = (
     selectedKeys: string[],
@@ -35,7 +41,7 @@ export default function AdminRequestTable({
 
   const handleReset = (clearFilters: () => void) => {
     clearFilters();
-    setSearchText('');
+    setSearchText("");
   };
 
   const getColumnSearchProps = (dataIndex: DataIndex): ColumnType<Request> => ({
@@ -44,9 +50,9 @@ export default function AdminRequestTable({
         <Input
           placeholder={`Search ${dataIndex}`}
           value={selectedKeys[0]}
-          onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
           onPressEnter={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
-          style={{ marginBottom: 8, display: 'block' }}
+          style={{ marginBottom: 8, display: "block" }}
         />
         <Space>
           <Button
@@ -58,51 +64,46 @@ export default function AdminRequestTable({
           >
             Search
           </Button>
-          <Button
-            onClick={() => handleReset(clearFilters!)}
-            size="small"
-            style={{ width: 90 }}
-          >
+          <Button onClick={() => handleReset(clearFilters!)} size="small" style={{ width: 90 }}>
             Reset
           </Button>
         </Space>
       </div>
     ),
     filterIcon: (filtered: boolean) => (
-      <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
     ),
     onFilter: (value, record) =>
       record[dataIndex]
-        .toString()
+        ?.toString()
         .toLowerCase()
         .includes((value as string).toLowerCase()),
   });
 
   const columns: ColumnsType<Request> = [
     {
-      title: "ID",
-      dataIndex: "key",
-      key: "key",
-      ...getColumnSearchProps("key"),
+      title: "Ordinal",
+      dataIndex: "ordinal",
+      key: "ordinal",
+      render: (_, __, index) => index + 1,
     },
     {
-      title: "Requestor",
-      dataIndex: "requestor",
-      key: "requestor",
-      ...getColumnSearchProps("requestor"),
+      title: "Requestor Email",
+      dataIndex: "requestorEmail",
+      key: "requestorEmail",
+      ...getColumnSearchProps("requestorEmail"),
     },
     {
       title: "Date Requested",
-      dataIndex: "dateRequested",
-      key: "dateRequested",
+      dataIndex: "requestDate",
+      key: "requestDate",
       render: (date: string) =>
         new Date(date).toLocaleDateString("en-US", {
           year: "numeric",
           month: "2-digit",
           day: "2-digit",
         }),
-      sorter: (a, b) =>
-        new Date(a.dateRequested).getTime() - new Date(b.dateRequested).getTime(),
+      sorter: (a, b) => new Date(a.requestDate).getTime() - new Date(b.requestDate).getTime(),
     },
     {
       title: "Books",
@@ -119,27 +120,28 @@ export default function AdminRequestTable({
       dataIndex: "status",
       key: "status",
       filters: [
-        { text: "Waiting", value: "waiting" },
-        { text: "Approved", value: "approved" },
-        { text: "Rejected", value: "rejected" },
+        { text: "Waiting", value: 2 },
+        { text: "Approved", value: 0 },
+        { text: "Rejected", value: 1 },
       ],
       onFilter: (value, record) => record.status === value,
-      render: (_status: Request["status"], record) => {
-        const isFinal = record.status === "approved" || record.status === "rejected";
+      render: (status: Request["status"], record) => {
+        const label = statusMap[status];
+        const isFinal = status === 0 || status === 1;
         return (
           <Select
-            value={record.status}
+            value={status}
             onChange={(value) => onStatusChange(record.key, value)}
             disabled={isFinal}
             style={{ width: 140 }}
           >
-            <Option value="waiting">
+            <Option value={2}>
               <Tag color={statusColors.waiting}>Waiting</Tag>
             </Option>
-            <Option value="approved">
+            <Option value={0}>
               <Tag color={statusColors.approved}>Approved</Tag>
             </Option>
-            <Option value="rejected">
+            <Option value={1}>
               <Tag color={statusColors.rejected}>Rejected</Tag>
             </Option>
           </Select>
@@ -155,8 +157,7 @@ export default function AdminRequestTable({
       rowKey="key"
       pagination={{
         pageSize: 5,
-        showTotal: (total, range) =>
-          `${range[0]}-${range[1]} of ${total} requests`,
+        showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} requests`,
       }}
       scroll={{ x: "max-content" }}
       bordered

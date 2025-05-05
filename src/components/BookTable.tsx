@@ -134,30 +134,20 @@ export default function BookTable({
       title: "Categories",
       dataIndex: "categories",
       key: "categories",
-      render: (categories: Category[]) => (
-        <span>
-          {categories.map((category) => (
-            <Tag key={category.id || category.name} color="blue">
-              {category.name}
-            </Tag>
-          ))}
-        </span>
-      ),
-      // filters: [
-      //   { text: "Fiction", value: "Fiction" },
-      //   { text: "Classic", value: "Classic" },
-      //   { text: "Science Fiction", value: "Science Fiction" },
-      //   { text: "Romance", value: "Romance" },
-      //   { text: "Fantasy", value: "Fantasy" },
-      //   { text: "Adventure", value: "Adventure" },
-      //   { text: "Dystopian", value: "Dystopian" },
-      // ],
-      // onFilter: (value: boolean | Key, record: Book): boolean => {
-      //   if (typeof value === "string") {
-      //     return record.categories.some((cat) => cat.name === value);
-      //   }
-      //   return false;
-      // },
+      render: (categories: Category[] = []) => {
+        const validCategories = categories.filter(cat => !!cat && !!cat.name);
+        return validCategories.length > 0 ? (
+          <>
+            {validCategories.map(cat => (
+              <Tag color="blue" key={cat.id || cat.name}>
+                {cat.name}
+              </Tag>
+            ))}
+          </>
+        ) : (
+          <span style={{ color: '#999' }}>No categories</span>
+        );
+      },
     },
     {
       title: "Quantity",

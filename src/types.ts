@@ -1,10 +1,7 @@
-export type StoreContextType =
-  | {
-      role: "admin" | "user";
-    }
-  | {
-      role: "user";
-    };
+export type StoreContextType = {
+  userId: string;
+  role: "admin" | "user";
+};
 
 export type StoreType = [
   StoreContextType,
@@ -24,11 +21,15 @@ export type DataIndex = keyof Book;
 
 // Request interface
 export interface Request {
+  id: string;
   key: string;
-  requestor: string;
-  dateRequested: string;
+  requestDate: string;
+  dueDate: string;
+  updateDate: string;
   books: Book[];
-  status: "waiting" | "approved" | "rejected";
+  requestorEmail: string;
+  approverEmail: string;
+  status: 0 | 1 | 2;
 }
 
 export type Book = {
@@ -53,24 +54,37 @@ export type Response = {
   success: boolean;
   statusCode: number;
   errors: string[] | null;
-  content: any
-}
+  content: any;
+};
 
 export type PaginatedResult<T> = {
   data: T[];
   currentPage: number;
   totalPage: number;
   limit: number;
-}
+};
 
 export type CreateBookDto = {
   title: string;
   author: string;
   editionNumber: number;
   categoryIds: string[];
-}
+};
 
 export type UpdateBookDto = CreateBookDto & {
   quantity: number;
   isAvailable: boolean;
-}
+};
+
+export type CreateRequestDto = {
+  requestorId: string;
+  dueDate: string;
+  bookIds: string[];
+};
+
+export type UpdateRequestDto = {
+  status: 0 | 1 | 2;
+  approverId: string;
+  dueDate: string;
+  bookIds: string[];
+};
