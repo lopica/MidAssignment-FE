@@ -1,13 +1,9 @@
-// components/AdminBookTable.tsx
-import { useState } from 'react';
-import { Table, Tag, Input, Space, Button } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
-import type { ColumnsType, ColumnType, TableProps } from 'antd/es/table';
-import type { FilterConfirmProps } from 'antd/es/table/interface';
-import type { JSX, Key } from 'react';
-import { Book } from '../types';
-
-type DataIndex = keyof Book;
+import { JSX, useState } from "react";
+import { Table, Tag, Input, Space, Button } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+import type { ColumnsType, ColumnType, TableProps } from "antd/es/table";
+import { Book, Category } from "../types";
+import { FilterConfirmProps, Key } from "antd/es/table/interface";
 
 interface AdminBookTableProps {
   data: Book[];
@@ -16,6 +12,8 @@ interface AdminBookTableProps {
   setSelectedRowKeys?: (keys: Key[]) => void;
   enableRowSelection?: boolean;
   onEdit?: (bookKey: string) => void;
+  onPageChange: (page: number, pageSize: number) => void; // Add this prop for dynamic pagination
+  total: number; // Total number of books
 }
 
 export default function AdminBookTable({
@@ -25,14 +23,16 @@ export default function AdminBookTable({
   setSelectedRowKeys,
   enableRowSelection = false,
   onEdit,
+  onPageChange,
+  total,
 }: Readonly<AdminBookTableProps>): JSX.Element {
-  const [searchText, setSearchText] = useState('');
-  const [searchedColumn, setSearchedColumn] = useState('');
+  const [searchText, setSearchText] = useState("");
+  const [searchedColumn, setSearchedColumn] = useState("");
 
   const handleSearch = (
     selectedKeys: string[],
     confirm: (param?: FilterConfirmProps) => void,
-    dataIndex: DataIndex
+    dataIndex: keyof Book
   ) => {
     confirm();
     setSearchText(selectedKeys[0]);
@@ -41,41 +41,56 @@ export default function AdminBookTable({
 
   const handleReset = (clearFilters: () => void) => {
     clearFilters();
-    setSearchText('');
+    setSearchText("");
   };
 
-  const getColumnSearchProps = (dataIndex: DataIndex): ColumnType<Book> => ({
-    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+  const getColumnSearchProps = (dataIndex: keyof Book): ColumnType<Book> => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+    }) => (
       <div className="p-2">
         <Input
           placeholder={`Search ${dataIndex}`}
           value={selectedKeys[0]}
-          onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-          onPressEnter={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
-          style={{ width: 188, marginBottom: 8, display: 'block' }}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() =>
+            handleSearch(selectedKeys as string[], confirm, dataIndex)
+          }
+          style={{ width: 188, marginBottom: 8, display: "block" }}
         />
         <Space>
           <Button
             type="primary"
-            onClick={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
+            onClick={() =>
+              handleSearch(selectedKeys as string[], confirm, dataIndex)
+            }
             icon={<SearchOutlined />}
             size="small"
             style={{ width: 90 }}
           >
             Search
           </Button>
-          <Button onClick={() => handleReset(clearFilters!)} size="small" style={{ width: 90 }}>
+          <Button
+            onClick={() => handleReset(clearFilters!)}
+            size="small"
+            style={{ width: 90 }}
+          >
             Reset
           </Button>
         </Space>
       </div>
     ),
-    filterIcon: filtered => (
-      <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+    filterIcon: (filtered) => (
+      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
     ),
     onFilter: (value, record) => {
       const recordValue = record[dataIndex];
-      return typeof value === 'string' && recordValue
+      return typeof value === "string" && recordValue
         ? recordValue.toString().toLowerCase().includes(value.toLowerCase())
         : false;
     },
@@ -83,71 +98,88 @@ export default function AdminBookTable({
 
   const columns: ColumnsType<Book> = [
     {
-      title: 'Title',
-      dataIndex: 'title',
-      key: 'title',
+      title: "Title",
+      dataIndex: "title",
+      key: "title",
       sorter: (a, b) => a.title.localeCompare(b.title),
-      ...getColumnSearchProps('title'),
+      ...getColumnSearchProps("title"),
     },
     {
-      title: 'Author',
-      dataIndex: 'author',
-      key: 'author',
+      title: "Author",
+      dataIndex: "author",
+      key: "author",
       sorter: (a, b) => a.author.localeCompare(b.author),
-      ...getColumnSearchProps('author'),
+      ...getColumnSearchProps("author"),
     },
     {
-      title: 'Edition',
-      dataIndex: 'editionNumber',
-      key: 'editionNumber',
+      title: "Edition",
+      dataIndex: "editionNumber",
+      key: "editionNumber",
       sorter: (a, b) => a.editionNumber - b.editionNumber,
     },
     {
-      title: 'Categories',
-      dataIndex: 'categories',
-      key: 'categories',
-      filters: Array.from(new Set(data.flatMap(b => b.categories))).map(cat => ({
-        text: cat,
-        value: cat,
+      title: "Categories",
+      dataIndex: "categories",
+      key: "categories",
+      filters: Array.from(
+        new Map(
+          data
+            .flatMap((b) => b.categories || []) // safeguard against undefined
+            .filter((cat): cat is Category => !!cat && !!cat.name) // filter out undefined/null or missing name
+            .map((cat) => [cat.name, cat])
+        ).values()
+      ).map((cat) => ({
+        text: cat.name,
+        value: cat.name,
       })),
-      onFilter: (value, record) => record.categories.includes(value as string),
-      render: categories => (
-        <>
-          {categories.map((cat : string) => (
-            <Tag color="blue" key={cat}>
-              {cat}
-            </Tag>
-          ))}
-        </>
-      ),
+
+      onFilter: (value, record) =>
+        record.categories.some((cat) => cat.name === value),
+      render: (categories: Category[] = []) => {
+        const validCategories = categories.filter(cat => !!cat && !!cat.name);
+        return validCategories.length > 0 ? (
+          <>
+            {validCategories.map(cat => (
+              <Tag color="blue" key={cat.id || cat.name}>
+                {cat.name}
+              </Tag>
+            ))}
+          </>
+        ) : (
+          <span style={{ color: '#999' }}>No categories</span>
+        );
+      },
+      
     },
     {
-          title: "Quantity",
-          dataIndex: "quantity",
-          key: "quantity",
-          render: (quantity: number) => (
-            <Tag color={quantity > 0 ? "green" : "red"}>
-              {quantity > 0 ? `${quantity} Available` : "Out of Stock"}
-            </Tag>
-          ),
-          sorter: (a, b) => a.quantity - b.quantity,
-          filters: [
-            { text: "Available", value: "available" },
-            { text: "Out of Stock", value: "outofstock" },
-          ],
-          onFilter: (value: string | boolean | Key, record: Book): boolean => {
-            if (value === "available") {
-              return record.quantity > 0;
-            }
-            if (value === "outofstock") {
-              return record.quantity === 0;
-            }
-            return false;
-          },
-        },
+      title: "Quantity",
+      dataIndex: "quantity",
+      key: "quantity",
+      render: (quantity: number) => (
+        <Tag color={quantity > 0 ? "green" : "red"}>
+          {quantity > 0 ? `${quantity} Available` : "Out of Stock"}
+        </Tag>
+      ),
+      sorter: (a, b) => a.quantity - b.quantity,
+    },
     {
-      title: 'Actions',
-      key: 'actions',
+      title: "Availability",
+      dataIndex: "isAvailable",
+      key: "isAvailable",
+      render: (isAvailable: boolean) => (
+        <Tag color={isAvailable ? "green" : "volcano"}>
+          {isAvailable ? "On" : "Off"}
+        </Tag>
+      ),
+      filters: [
+        { text: "On", value: true },
+        { text: "Off", value: false },
+      ],
+      onFilter: (value, record) => record.isAvailable === value,
+    },
+    {
+      title: "Actions",
+      key: "actions",
       render: (_, record) => (
         <Button onClick={() => onEdit?.(record.key)} type="link">
           Edit
@@ -156,7 +188,7 @@ export default function AdminBookTable({
     },
   ];
 
-  const rowSelection: TableProps<Book>['rowSelection'] =
+  const rowSelection: TableProps<Book>["rowSelection"] =
     enableRowSelection && selectedRowKeys && setSelectedRowKeys
       ? {
           selectedRowKeys,
@@ -171,10 +203,13 @@ export default function AdminBookTable({
       dataSource={data}
       loading={loading}
       bordered
-      scroll={{ x: 'max-content' }}
+      scroll={{ x: "max-content" }}
       pagination={{
+        total, // Total number of books
         pageSize: 5,
-        showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} books`,
+        showTotal: (total, range) =>
+          `${range[0]}-${range[1]} of ${total} books`,
+        onChange: (page, pageSize) => onPageChange(page, pageSize),
       }}
     />
   );

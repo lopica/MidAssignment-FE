@@ -1,101 +1,173 @@
 import { Book, Category, PaginatedResult, Request, StoreContextType } from "./types";
 
 export const DEFAULT_STORE_VALUE: StoreContextType = {
-  role: "admin",
+  role: "user",
 };
 
-export const DEFAULT_BOOKS: Book[] = [
+
+
+// Step 1: Initialize empty arrays
+export const DEFAULT_BOOKS: Book[] = [];
+export const DEFAULT_CATEGORIES: Category[] = [];
+
+// Step 2: Fill categories first with just names and keys
+DEFAULT_CATEGORIES.push(
+  { key: "1", name: "Fiction", books: [] },
+  { key: "2", name: "Fantasy", books: [] },
+  { key: "3", name: "Dystopian", books: [] },
+  { key: "4", name: "Classic", books: [] },
+  { key: "5", name: "Romance", books: [] },
+  { key: "6", name: "Coming-of-age", books: [] },
+  { key: "7", name: "Adventure", books: [] },
+  { key: "8", name: "Philosophy", books: [] },
+  { key: "9", name: "Drama", books: [] },
+  { key: "10", name: "Science Fiction", books: [] },
+  { key: "11", name: "Psychological Fiction", books: [] },
+  { key: "12", name: "Mystery", books: [] },
+  { key: "13", name: "Historical", books: [] }
+);
+
+// Step 3: Create books, now that categories exist
+DEFAULT_BOOKS.push(
   {
+    id: "1",
     key: "1",
     title: "To Kill a Mockingbird",
     author: "Harper Lee",
     editionNumber: 3,
-    categories: ["Fiction", "Classic", "Drama"],
+    categories: [
+      DEFAULT_CATEGORIES.find(c => c.name === "Fiction")!,
+      DEFAULT_CATEGORIES.find(c => c.name === "Classic")!,
+      DEFAULT_CATEGORIES.find(c => c.name === "Drama")!,
+    ],
     quantity: 5,
     isAvailable: true,
   },
   {
+    id: "2",
     key: "2",
     title: "1984",
     author: "George Orwell",
     editionNumber: 2,
-    categories: ["Science Fiction", "Dystopian"],
+    categories: [
+      DEFAULT_CATEGORIES.find(c => c.name === "Science Fiction")!,
+      DEFAULT_CATEGORIES.find(c => c.name === "Dystopian")!,
+    ],
     quantity: 0,
     isAvailable: false,
   },
   {
+    id: "3",
     key: "3",
     title: "The Great Gatsby",
     author: "F. Scott Fitzgerald",
     editionNumber: 5,
-    categories: ["Classic", "Fiction"],
+    categories: [
+      DEFAULT_CATEGORIES.find(c => c.name === "Classic")!,
+      DEFAULT_CATEGORIES.find(c => c.name === "Fiction")!,
+    ],
     quantity: 3,
     isAvailable: true,
   },
   {
+    id: "4",
     key: "4",
     title: "Pride and Prejudice",
     author: "Jane Austen",
     editionNumber: 1,
-    categories: ["Romance", "Classic"],
+    categories: [
+      DEFAULT_CATEGORIES.find(c => c.name === "Romance")!,
+      DEFAULT_CATEGORIES.find(c => c.name === "Classic")!,
+    ],
     quantity: 2,
     isAvailable: true,
   },
   {
+    id: "5",
     key: "5",
     title: "The Catcher in the Rye",
     author: "J.D. Salinger",
     editionNumber: 4,
-    categories: ["Fiction", "Coming-of-age"],
+    categories: [
+      DEFAULT_CATEGORIES.find(c => c.name === "Fiction")!,
+      DEFAULT_CATEGORIES.find(c => c.name === "Coming-of-age")!,
+    ],
     quantity: 0,
     isAvailable: false,
   },
   {
+    id: "6",
     key: "6",
     title: "Lord of the Rings",
     author: "J.R.R. Tolkien",
     editionNumber: 3,
-    categories: ["Fantasy", "Adventure"],
+    categories: [
+      DEFAULT_CATEGORIES.find(c => c.name === "Fantasy")!,
+      DEFAULT_CATEGORIES.find(c => c.name === "Adventure")!,
+    ],
     quantity: 7,
     isAvailable: true,
   },
   {
+    id: "7",
     key: "7",
     title: "The Hobbit",
     author: "J.R.R. Tolkien",
     editionNumber: 2,
-    categories: ["Fantasy", "Adventure"],
+    categories: [
+      DEFAULT_CATEGORIES.find(c => c.name === "Fantasy")!,
+      DEFAULT_CATEGORIES.find(c => c.name === "Adventure")!,
+    ],
     quantity: 3,
     isAvailable: true,
   },
   {
+    id: "8",
     key: "8",
     title: "Brave New World",
     author: "Aldous Huxley",
     editionNumber: 1,
-    categories: ["Science Fiction", "Dystopian"],
+    categories: [
+      DEFAULT_CATEGORIES.find(c => c.name === "Science Fiction")!,
+      DEFAULT_CATEGORIES.find(c => c.name === "Dystopian")!,
+    ],
     quantity: 4,
     isAvailable: true,
   },
   {
+    id: "9",
     key: "9",
     title: "The Alchemist",
     author: "Paulo Coelho",
     editionNumber: 3,
-    categories: ["Fiction", "Philosophy"],
+    categories: [
+      DEFAULT_CATEGORIES.find(c => c.name === "Fiction")!,
+      DEFAULT_CATEGORIES.find(c => c.name === "Philosophy")!,
+    ],
     quantity: 0,
     isAvailable: false,
   },
   {
+    id: "10",
     key: "10",
     title: "Crime and Punishment",
     author: "Fyodor Dostoevsky",
     editionNumber: 6,
-    categories: ["Classic", "Psychological Fiction"],
+    categories: [
+      DEFAULT_CATEGORIES.find(c => c.name === "Classic")!,
+      DEFAULT_CATEGORIES.find(c => c.name === "Psychological Fiction")!,
+    ],
     quantity: 2,
     isAvailable: true,
-  },
-];
+  }
+);
+
+// Step 4: Assign books to categories now that books exist
+DEFAULT_CATEGORIES.forEach(category => {
+  category.books = DEFAULT_BOOKS.filter(book =>
+    book.categories.some(cat => cat.name === category.name)
+  );
+});
 
 export const DEFAULT_REQUESTS: Request[] = [
   {
@@ -128,85 +200,6 @@ export const DEFAULT_REQUESTS: Request[] = [
     status: "rejected",
   },
 ];
-
-export const DEFAULT_CATEGORIES: Category[] = [
-  {
-    key: "1",
-    name: "Fiction",
-    books: DEFAULT_BOOKS.filter((book) =>
-      ["1984", "To Kill a Mockingbird", "The Alchemist"].includes(book.title)
-    ),
-  },
-  {
-    key: "2",
-    name: "Fantasy",
-    books: DEFAULT_BOOKS.filter((book) =>
-      ["The Hobbit", "Lord of the Rings"].includes(book.title)
-    ),
-  },
-  {
-    key: "3",
-    name: "Dystopian",
-    books: DEFAULT_BOOKS.filter((book) => book.title === "Brave New World"),
-  },
-  {
-    key: "4",
-    name: "Classic",
-    books: DEFAULT_BOOKS.filter((book) =>
-      ["The Great Gatsby", "Crime and Punishment"].includes(book.title)
-    ),
-  },
-  {
-    key: "5",
-    name: "Romance",
-    books: DEFAULT_BOOKS.filter((book) => book.title === "Pride and Prejudice"),
-  },
-  {
-    key: "6",
-    name: "Coming-of-age",
-    books: DEFAULT_BOOKS.filter((book) => book.title === "The Catcher in the Rye"),
-  },
-  {
-    key: "7",
-    name: "Adventure",
-    books: DEFAULT_BOOKS.filter((book) =>
-      ["The Hobbit", "Lord of the Rings"].includes(book.title)
-    ),
-  },
-  {
-    key: "8",
-    name: "Philosophy",
-    books: DEFAULT_BOOKS.filter((book) => book.title === "The Alchemist"),
-  },
-  {
-    key: "9",
-    name: "Drama",
-    books: DEFAULT_BOOKS.filter((book) => book.title === "To Kill a Mockingbird"),
-  },
-  {
-    key: "10",
-    name: "Science Fiction",
-    books: DEFAULT_BOOKS.filter((book) =>
-      ["Brave New World", "1984"].includes(book.title)
-    ),
-  },
-  {
-    key: "11",
-    name: "Psychological Fiction",
-    books: DEFAULT_BOOKS.filter((book) => book.title === "Crime and Punishment"),
-  },
-  {
-    key: "12",
-    name: "Mystery",
-    books: [],
-  },
-  {
-    key: "13",
-    name: "Historical",
-    books: [],
-  },
-];
-
 
 export const PAGINATED_BOOKS: PaginatedResult<Book> = {
   data: DEFAULT_BOOKS.slice(0, 5), // Simulating page 1

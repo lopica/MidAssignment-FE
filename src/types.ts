@@ -32,11 +32,12 @@ export interface Request {
 }
 
 export type Book = {
+  id: string;
   key: string;
   title: string;
   author: string;
   editionNumber: number;
-  categories: string[];
+  categories: Category[];
   quantity: number;
   isAvailable: boolean;
 };
@@ -62,3 +63,14 @@ export type PaginatedResult<T> = {
   limit: number;
 }
 
+export type CreateBookDto = {
+  title: string;
+  author: string;
+  editionNumber: number;
+  categoryIds: string[];
+}
+
+export type UpdateBookDto = CreateBookDto & {
+  quantity: number;
+  isAvailable: boolean;
+}

@@ -1,6 +1,6 @@
 import { Dispatch, Key, SetStateAction } from "react";
 import { Table, Tag, Button, Input, Space } from "antd";
-import { Book, DataIndex } from "../types";
+import { Book, Category, DataIndex } from "../types";
 import { ColumnsType, TableProps } from "antd/es/table";
 import { ColumnType, FilterConfirmProps } from "antd/es/table/interface";
 import { SearchOutlined } from "@ant-design/icons";
@@ -9,12 +9,16 @@ export default function BookTable({
   data,
   loading = false,
   selectedRowKeys,
-  setSelectedRowKeys
+  setSelectedRowKeys,
+  total,
+  onPageChange,
 }: Readonly<{
   data: Book[];
   loading?: boolean;
   selectedRowKeys?: React.Key[];
   setSelectedRowKeys?: Dispatch<SetStateAction<React.Key[]>>;
+  total: number;
+  onPageChange: (page: number, pageSize: number) => void;
 }>): React.ReactElement {
   const onSelectChange = (newSelectedRowKeys: Key[]): void => {
     if (setSelectedRowKeys) {
@@ -22,15 +26,16 @@ export default function BookTable({
     }
   };
 
-  const rowSelection: TableProps<Book>["rowSelection"] = selectedRowKeys && setSelectedRowKeys
-    ? {
-        selectedRowKeys,
-        onChange: onSelectChange,
-        getCheckboxProps: (record: Book) => ({
-          disabled: record.quantity === 0, // Disable checkbox if quantity is 0
-        }),
-      }
-    : undefined;  // If not provided, don't show row selection
+  const rowSelection: TableProps<Book>["rowSelection"] =
+    selectedRowKeys && setSelectedRowKeys
+      ? {
+          selectedRowKeys,
+          onChange: onSelectChange,
+          getCheckboxProps: (record: Book) => ({
+            disabled: record.quantity === 0,
+          }),
+        }
+      : undefined;
 
   const handleSearch = (
     selectedKeys: string[],
@@ -38,13 +43,10 @@ export default function BookTable({
     dataIndex: DataIndex
   ): void => {
     confirm();
-    // setSearchText(selectedKeys[0]);
-    // setSearchedColumn(dataIndex);
   };
 
   const handleReset = (clearFilters: () => void): void => {
     clearFilters();
-    // setSearchText("");
   };
 
   const getColumnSearchProps = (dataIndex: DataIndex): ColumnType<Book> => ({
@@ -132,30 +134,30 @@ export default function BookTable({
       title: "Categories",
       dataIndex: "categories",
       key: "categories",
-      render: (categories: string[]) => (
+      render: (categories: Category[]) => (
         <span>
           {categories.map((category) => (
-            <Tag color="blue" key={category} className="mr-1 mb-1">
-              {category}
+            <Tag key={category.id || category.name} color="blue">
+              {category.name}
             </Tag>
           ))}
         </span>
       ),
-      filters: [
-        { text: "Fiction", value: "Fiction" },
-        { text: "Classic", value: "Classic" },
-        { text: "Science Fiction", value: "Science Fiction" },
-        { text: "Romance", value: "Romance" },
-        { text: "Fantasy", value: "Fantasy" },
-        { text: "Adventure", value: "Adventure" },
-        { text: "Dystopian", value: "Dystopian" },
-      ],
-      onFilter: (value: boolean | Key, record: Book): boolean => {
-        if (typeof value === "string") {
-          return record.categories.includes(value);
-        }
-        return false;
-      },
+      // filters: [
+      //   { text: "Fiction", value: "Fiction" },
+      //   { text: "Classic", value: "Classic" },
+      //   { text: "Science Fiction", value: "Science Fiction" },
+      //   { text: "Romance", value: "Romance" },
+      //   { text: "Fantasy", value: "Fantasy" },
+      //   { text: "Adventure", value: "Adventure" },
+      //   { text: "Dystopian", value: "Dystopian" },
+      // ],
+      // onFilter: (value: boolean | Key, record: Book): boolean => {
+      //   if (typeof value === "string") {
+      //     return record.categories.some((cat) => cat.name === value);
+      //   }
+      //   return false;
+      // },
     },
     {
       title: "Quantity",
@@ -185,18 +187,20 @@ export default function BookTable({
 
   return (
     <Table
-      rowSelection={rowSelection} // This will be undefined if not provided
+      rowSelection={rowSelection}
       columns={columns}
       dataSource={data}
+      loading={loading}
+      bordered
+      scroll={{ x: "max-content" }}
       pagination={{
+        total,
         pageSize: 5,
         showSizeChanger: false,
         showTotal: (total, range) =>
           `${range[0]}-${range[1]} of ${total} items`,
+        onChange: (page, pageSize) => onPageChange(page, pageSize),
       }}
-      scroll={{ x: "max-content" }}
-      loading={loading}
-      bordered
     />
   );
 }

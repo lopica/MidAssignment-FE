@@ -8,6 +8,8 @@ export function getAllCategories(
 ): Promise<PaginatedResult<Category>> {
   return axios.get(ENDPOINTS.CATEGORIES.GET_ALL(currentPage, 5, name));
 }
+export const getAllCategoriesWithoutPagination = () : Promise<Category[]> => 
+  axios.get(ENDPOINTS.CATEGORIES.GET_ALL_WITHOUT_PAGINATION());
 export const addCategory = (category: {name: string}) : Promise<Category> =>
   axios.post(ENDPOINTS.CATEGORIES.ADD, category);
 export const getCategoryById = (id: string) =>
