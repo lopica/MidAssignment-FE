@@ -54,6 +54,11 @@ const ENDPOINTS = {
     UPDATE: (id: string) => `/api/borrowing-requests/${id}`,
     DELETE: (id: string) => `/api/borrowing-requests/${id}`,
   },
+  AUTH: {
+    LOGIN: "/api/auth/login",
+    LOGOUT: "/api/auth/logout",
+    REFRESH: "api/auth/refresh",
+  }
 };
 
 export default ENDPOINTS;

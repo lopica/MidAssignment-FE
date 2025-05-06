@@ -1,12 +1,14 @@
 export type StoreContextType = {
   userId: string;
-  role: "admin" | "user";
+  email: string;
+  role: "admin" | "user" | "";
 };
 
 export type StoreType = [
   StoreContextType,
-  setStore: (store: StoreContextType) => void
+  setStore: (store: StoreContextType | ((prev: StoreContextType) => StoreContextType)) => void
 ];
+
 
 export const statusColors: Record<"waiting" | "approved" | "rejected", string> =
   {
@@ -87,4 +89,16 @@ export type UpdateRequestDto = {
   approverId: string;
   dueDate: string;
   bookIds: string[];
+};
+
+export type LoginDto = {
+  email: string;
+  password: string;
+  isRememberLogin: boolean;
+};
+
+export type LoginResponseDto = {
+  id: string;
+  email: string;
+  role: string;
 };

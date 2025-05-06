@@ -1,8 +1,9 @@
 import { Book, Category, PaginatedResult, Request, StoreContextType } from "./types";
 
 export const DEFAULT_STORE_VALUE: StoreContextType = {
-  userId: "145a1994-6e25-456a-ac4a-3f13fd21afa9",
-  role: "admin",
+  userId: "",
+  email: "",
+  role: "",
 };
 
 

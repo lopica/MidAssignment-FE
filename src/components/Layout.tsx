@@ -8,6 +8,7 @@ import {
 import { Layout, Menu, theme, Avatar, Dropdown, message } from "antd";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import { StoreContext } from "../context/store";
+import { useAuth } from "../hooks/useAuth";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -54,8 +55,9 @@ export default function CustomLayout() {
   } = theme.useToken();
   const navigate = useNavigate();
   const location = useLocation();
-  const [store] = useContext(StoreContext)
-  const pageTitle = titleMap[location.pathname] || "";
+  const [store] = useContext(StoreContext);
+  const pageTitle = titleMap[location.pathname] ?? "";
+  const { logout } = useAuth();
 
   return (
     <Layout className="h-screen overflow-hidden">
@@ -66,7 +68,7 @@ export default function CustomLayout() {
         onCollapse={(collapsed, type) => console.log(collapsed, type)}
       >
         <div className="flex justify-center">
-        <img src="/nash_tech.png" alt="Logo" className="h-24 object-cover" />
+          <img src="/nash_tech.png" alt="Logo" className="h-24 object-cover" />
         </div>
         <div className="h-14 flex items-center justify-center text-white text-lg font-bold border-b border-gray-700">
           <p>Library Management</p>
@@ -114,11 +116,15 @@ export default function CustomLayout() {
             <Dropdown
               menu={{
                 items: userMenu,
-                onClick: ({ key }: any) => {
-                  // Handle menu item clicks here
+                onClick: async ({ key }: any) => {
                   if (key === "1") {
-                    message.success("Logout successful!");
-                    navigate("/");
+                    try {
+                      await logout();
+                      message.success("Logout successful!");
+                      navigate("/");
+                    } catch (error: any) {
+                      message.error("Logout failed.");
+                    }
                   }
                 },
               }}

@@ -2,21 +2,32 @@ import { useState } from "react";
 import { Form, Input, Button, Checkbox, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
+import { LoginDto } from "../types";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Login() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const {login} = useAuth()
 
-  const onFinish = (values: any) => {
+  const onFinish = async (values: any) => {
     setLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Login form values:", values);
-      message.success("Login successful!");
+    try {
+      await login({
+        email: values.email,
+        password: values.password,
+        isRememberLogin: values.remember,
+      } as LoginDto);
+      setTimeout(()=>{
+        message.success("Login successful!");
+        navigate("/books");
+      }, 500)
+    } catch (error: any) {
+      console.error("Login error:", error);
+      message.error(error?.response?.data?.message ?? "Login failed");
+    } finally {
       setLoading(false);
-      navigate("/books");
-    }, 1500);
+    }
   };
 
   return (
@@ -46,6 +57,7 @@ export default function Login() {
               prefix={<UserOutlined className="text-gray-400" />}
               placeholder="Email address"
               className="rounded-md"
+              autoComplete="email"
             />
           </Form.Item>
 
@@ -57,6 +69,7 @@ export default function Login() {
               prefix={<LockOutlined className="text-gray-400" />}
               placeholder="Password"
               className="rounded-md"
+              autoComplete="current-password"
             />
           </Form.Item>
 

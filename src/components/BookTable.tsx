@@ -16,9 +16,9 @@ export default function BookTable({
   data: Book[];
   loading?: boolean;
   selectedRowKeys?: React.Key[];
-  setSelectedRowKeys?: Dispatch<SetStateAction<React.Key[]>>;
-  total: number;
-  onPageChange: (page: number, pageSize: number) => void;
+  setSelectedRowKeys?: React.Dispatch<React.SetStateAction<React.Key[]>>;
+  total?: number;
+  onPageChange?: (page: number, pageSize: number) => void;
 }>): React.ReactElement {
   const onSelectChange = (newSelectedRowKeys: Key[]): void => {
     if (setSelectedRowKeys) {
@@ -189,7 +189,7 @@ export default function BookTable({
         showSizeChanger: false,
         showTotal: (total, range) =>
           `${range[0]}-${range[1]} of ${total} items`,
-        onChange: (page, pageSize) => onPageChange(page, pageSize),
+        onChange: (page, pageSize) => onPageChange ? onPageChange(page, pageSize) : null,
       }}
     />
   );

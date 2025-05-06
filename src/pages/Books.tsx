@@ -25,7 +25,7 @@ export default function Books(): React.ReactElement {
     setLoading(true);
     try {
       const result = await getAllBooks(currentPage);
-      
+      console.log(result)
       // Add a unique key to each book
       const booksWithKey = result.data.map((book, index) => ({
         ...book,  // Spread the book properties

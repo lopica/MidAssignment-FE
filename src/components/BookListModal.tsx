@@ -16,7 +16,7 @@ export default function BookListModal({
 }>) {
   return (
     <Modal
-      title={title || "Books"}
+      title={title ?? "Books"}
       open={isModalVisible}
       onCancel={handleCancel}
       footer={null}

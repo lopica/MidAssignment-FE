@@ -1,14 +1,14 @@
 import { Link } from "react-router";
 import { Button } from "antd";
 import { StoreContext } from "../context/store";
-import { use, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 export default function NotFound() {
     const [store] = useContext(StoreContext);
     const [link, setLink] = useState("/login");
 
     useEffect(() => {
-        if (store.role !== null) setLink("/books")
+        if (store.role !== "") setLink("/books")
         else setLink("/")
     }, [store]);
 
